@@ -1,0 +1,106 @@
+name: Build Container 
+run-name: Build Container
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  Get-Latest-Resonite-Package:
+    runs-on: ubuntu-latest
+    outputs:
+      cachekey: ${{ runner.os }}-resonite-genuine-${{ github.run_id }}-${{ github.run_attempt }}
+    steps:
+      - name: Setup steamcmd
+        uses: CyberAndrii/setup-steamcmd@v1
+      - name: Cache Resonite binary
+        id: cache-resonite
+        uses: actions/cache@v3
+        with:
+          path: ./steamdata
+          key: ${{ runner.os }}-resonite-genuine-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            ${{ runner.os }}-resonite-genuine
+      - name: Download and install Resonite
+        run: >
+          mkdir -p steamdata &&
+          steamcmd
+          +force_install_dir "$(pwd)/steamdata/"
+          +login ${{ secrets.STEAM_USERNAME }} ${{ secrets.STEAM_PASSWORD }}
+          +app_update 2519830 -beta headless -betapassword ${{ secrets.HEADLESS_CODE }} validate
+          +quit
+
+  Check-Latest-BuildID:
+    runs-on: ubuntu-latest
+    outputs:
+      build-id: ${{ steps.buildid.outputs.buildid }}
+      timeupdated: ${{ steps.buildid.outputs.timeupdated }}
+    steps:
+      - name: Get build ID of headless on Steam
+        id: buildid
+        run: >
+          curl -X GET 'https://api.steamcmd.net/v1/info/2519830' |
+          yq -P -o shell '.data.2519830.depots.branches.headless' >>
+          "${GITHUB_OUTPUT}"
+
+  Get-Resonite-Versions:
+    needs:
+      - Get-Latest-Resonite-Package
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.cver.outputs.version }}
+      buildid: ${{ steps.buildid.outputs.buildid }}
+    steps:
+      - name: Cache Resonite binary
+        id: cache-resonite
+        uses: actions/cache@v3
+        with:
+          path: ./steamdata
+          key: ${{ needs.Get-Latest-Resonite-Package.outputs.cachekey }}
+      - name: Get chronical version on Resonite
+        id: cver
+        run: echo "version=$(cat ./steamdata/Build.version)" >> "${GITHUB_OUTPUT}"
+      - name: Get build ID on Steam
+        id: buildid
+        run: echo "buildid=$(cat ./steamdata/steamapps/appmanifest_2519830.acf | perl -nlE 'if ($_ =~ /buildid/) { $_ =~ s/\s*"buildid"\s*\"(\d+)\"\s*/$1/; print $_; }')" >> "${GITHUB_OUTPUT}"
+
+  Build-Resonite-Container:
+    needs:
+      - Get-Resonite-Versions
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Check out repository code 
+        uses: actions/checkout@v4
+      - name: Setup buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to the container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata for the Docker image
+        id: extmeta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          flavor: latest=true
+          tags: |
+            type=raw,value=${{ needs.Get-Resonite-Versions.outputs.buildid }}
+            type=raw,value=${{ needs.Get-Resonite-Versions.outputs.version }}
+      - name: Build and push images
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.extmeta.outputs.tags }}
+          labels: ${{ steps.extmeta.outputs.labels }}
+          secrets: |
+            STEAM_USERNAME=${{ secrets.STEAM_USERNAME }}
+            STEAM_PASSWORD=${{ secrets.STEAM_PASSWORD }}
+            HEADLESS_CODE=${{ secrets.HEADLESS_CODE }}
