@@ -99,6 +99,14 @@ jobs:
           tags: |
             type=raw,value=${{ needs.Get-Resonite-Versions.outputs.buildid }}
             type=raw,value=${{ needs.Get-Resonite-Versions.outputs.version }}
+          labels: |
+            org.opencontainers.image.title=Resonite Container
+            net.pluser.resonite-container.steam-buildid=${{ needs.Get-Resonite-Versions.outputs.buildid }}
+            net.pluser.resonite-container.resonite-version=${{ needs.Get-Resonite-Versions.outputs.version }}
+          annotations: |
+            org.opencontainers.image.title=Resonite Container
+            net.pluser.resonite-container.steam-buildid=${{ needs.Get-Resonite-Versions.outputs.buildid }}
+            net.pluser.resonite-container.resonite-version=${{ needs.Get-Resonite-Versions.outputs.version }}
       - name: Cache Resonite binary
         id: cache-resonite
         uses: actions/cache@v3
@@ -120,6 +128,7 @@ jobs:
           push: true
           tags: ${{ steps.extmeta.outputs.tags }}
           labels: ${{ steps.extmeta.outputs.labels }}
+          annotations: ${{ steps.extmeta.outputs.annotations }}
           secrets: |
             STEAM_USERNAME=${{ secrets.STEAM_USERNAME }}
             STEAM_PASSWORD=${{ secrets.STEAM_PASSWORD }}
