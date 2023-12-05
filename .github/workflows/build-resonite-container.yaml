@@ -88,8 +88,6 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Setup steamcmd
-        uses: CyberAndrii/setup-steamcmd@v1
       - name: Extract metadata for the Docker image
         id: extmeta
         uses: docker/metadata-action@v5
@@ -113,13 +111,6 @@ jobs:
         with:
           path: ./steamdata
           key: ${{ needs.Get-Latest-Resonite-Package.outputs.cachekey }}
-      - name: Varidate Resonite files
-        run: >
-          steamcmd
-          +force_install_dir "$(pwd)/steamdata/"
-          +login ${{ secrets.STEAM_USERNAME }} ${{ secrets.STEAM_PASSWORD }}
-          +validate
-          +quit
       - name: Build and push images
         uses: docker/build-push-action@v5
         with:
