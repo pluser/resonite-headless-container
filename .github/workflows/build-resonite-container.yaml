@@ -63,10 +63,14 @@ jobs:
         run: echo "version=$(cat ./steamdata/Build.version)" >> "${GITHUB_OUTPUT}"
       - name: Get build ID on Steam
         id: buildid
-        run: echo "buildid=$(cat ./steamdata/steamapps/appmanifest_2519830.acf | perl -nlE 'if ($_ =~ /buildid/) { $_ =~ s/\s*"buildid"\s*\"(\d+)\"\s*/$1/; print $_; }')" >> "${GITHUB_OUTPUT}"
+        run: >
+          echo "buildid=$(cat ./steamdata/steamapps/appmanifest_2519830.acf |
+          perl -nlE 'if ($_ =~ /buildid/) { $_ =~ s/\s*"buildid"\s*\"(\d+)\"\s*/$1/; print $_; }')" >>
+          "${GITHUB_OUTPUT}"
 
   Build-Resonite-Container:
     needs:
+      - Get-Latest-Resonite-Package
       - Get-Resonite-Versions
     runs-on: ubuntu-latest
     permissions:
@@ -83,6 +87,8 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup steamcmd
+        uses: CyberAndrii/setup-steamcmd@v1
       - name: Extract metadata for the Docker image
         id: extmeta
         uses: docker/metadata-action@v5
@@ -92,6 +98,19 @@ jobs:
           tags: |
             type=raw,value=${{ needs.Get-Resonite-Versions.outputs.buildid }}
             type=raw,value=${{ needs.Get-Resonite-Versions.outputs.version }}
+      - name: Cache Resonite binary
+        id: cache-resonite
+        uses: actions/cache@v3
+        with:
+          path: ./steamdata
+          key: ${{ needs.Get-Latest-Resonite-Package.outputs.cachekey }}
+      - name: Varidate Resonite files
+        run: >
+          steamcmd
+          +force_install_dir "$(pwd)/steamdata/"
+          +login ${{ secrets.STEAM_USERNAME }} ${{ secrets.STEAM_PASSWORD }}
+          +validate
+          +quit
       - name: Build and push images
         uses: docker/build-push-action@v5
         with:
