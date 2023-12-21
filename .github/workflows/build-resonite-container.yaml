@@ -122,6 +122,7 @@ jobs:
           tags: ${{ steps.extmeta.outputs.tags }}
           labels: ${{ steps.extmeta.outputs.labels }}
           annotations: ${{ steps.extmeta.outputs.annotations }}
+          provenance: false # avoid bug of github https://github.com/orgs/community/discussions/45969
           secrets: |
             STEAM_USERNAME=${{ secrets.STEAM_USERNAME }}
             STEAM_PASSWORD=${{ secrets.STEAM_PASSWORD }}
