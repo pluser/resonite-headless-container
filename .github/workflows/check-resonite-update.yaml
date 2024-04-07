@@ -1,0 +1,44 @@
+name: Periodically Check Resonite Updates
+run-name: Check Update Periodically
+
+on:
+  workflow_dispatch:
+  schedule:
+  - cron: '35 * * * *'
+
+jobs:
+  Get-Container-BuildID:
+    runs-on: ubuntu-latest
+    outputs:
+      build-id: ${{ steps.buildid_current.outputs.value }}
+    steps:
+      - name: Get the last built version
+        id: buildid_current
+        uses: flownative/action-docker-get-label@v1
+        with:
+          image: ghcr.io/${{ github.repository }}:latest
+          label: net.pluser.resonite-container.steam-buildid
+          registry_username: ${{ github.actor }}
+          registry_password: ${{ secrets.GITHUB_TOKEN }}
+          registry_endpoint: https://ghcr.io/v2/
+
+  Get-Latest-BuildID:
+    runs-on: ubuntu-latest
+    outputs:
+      build-id: ${{ steps.buildid.outputs.buildid }}
+      timeupdated: ${{ steps.buildid.outputs.timeupdated }}
+    steps:
+      - name: Get build ID of headless on Steam
+        id: buildid
+        run: >
+          curl -X GET 'https://api.steamcmd.net/v1/info/2519830' |
+          yq -P -o shell '.data.2519830.depots.branches.headless' >>
+          "${GITHUB_OUTPUT}"
+
+  Build: 
+    needs:
+      - Get-Container-BuildID
+      - Get-Latest-BuildID
+    uses: ./.github/workflows/build-resonite-container.yaml
+    secrets: inherit
+    if: ${{ fromJSON(needs.Get-Container-BuildID.outputs.build-id) < fromJSON(needs.Get-Latest-BuildID.outputs.build-id) }}
