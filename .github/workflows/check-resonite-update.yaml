@@ -41,4 +41,4 @@ jobs:
       - Get-Latest-BuildID
     uses: ./.github/workflows/build-resonite-container.yaml
     secrets: inherit
-    if: ${{ fromJSON(needs.Get-Container-BuildID.outputs.build-id) < fromJSON(needs.Get-Latest-BuildID.outputs.buildid) }}
+    if: ${{ fromJSON(needs.Get-Container-BuildID.outputs.build-id) < fromJSON(needs.Get-Latest-BuildID.outputs.build-id) }}
