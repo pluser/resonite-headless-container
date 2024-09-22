@@ -24,8 +24,9 @@ RUN apt-get update && apt-get install -y libopus-dev libopus0 opus-tools libc-de
 COPY --from=base /steamdata /opt/Resonite
 # Steam Networking Socket does not support multiple instance.
 # COPY --from=base /root/.local/share/Steam/steamcmd/linux64/steamclient.so /root/.steam/sdk64/steamclient.so
-RUN mkdir -p /mnt/resonite/{cache,config,data,logs}
+RUN mkdir -p /mnt/resonite/cache /mnt/resonite/config /mnt/resonite/data /mnt/resonite/logs
 COPY ./resonite.sh /usr/local/bin/resonite
 
+VOLUME ["/mnt/resonite/cache", "/mnt/resonite/config", "/mnt/resonite/data", "/mnt/resonite/logs"]
 STOPSIGNAL SIGINT
-CMD [ "/usr/local/bin/resonite" ]
+ENTRYPOINT [ "/usr/local/bin/resonite" ]
