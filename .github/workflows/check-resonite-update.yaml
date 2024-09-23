@@ -35,7 +35,7 @@ jobs:
           yq -P -o shell '.data.2519830.depots.branches.headless' >>
           "${GITHUB_OUTPUT}"
 
-  Build: 
+  Build:
     needs:
       - Get-Container-BuildID
       - Get-Latest-BuildID

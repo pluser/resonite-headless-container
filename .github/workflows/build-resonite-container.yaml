@@ -1,4 +1,4 @@
-name: Build Container 
+name: Build Container
 run-name: Build Container
 
 on:
@@ -17,7 +17,7 @@ jobs:
         uses: CyberAndrii/setup-steamcmd@v1
       - name: Cache Resonite binary
         id: cache-resonite
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ./steamdata
           key: ${{ runner.os }}-resonite-genuine-${{ github.run_id }}-${{ github.run_attempt }}
@@ -55,7 +55,7 @@ jobs:
     steps:
       - name: Cache Resonite binary
         id: cache-resonite
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ./steamdata
           key: ${{ needs.Get-Latest-Resonite-Package.outputs.cachekey }}
@@ -77,8 +77,11 @@ jobs:
     permissions:
       contents: read
       packages: write
+    strategy:
+      matrix:
+        variant: [vanilla, crystite]
     steps:
-      - name: Check out repository code 
+      - name: Check out repository code
         uses: actions/checkout@v4
       - name: Setup buildx
         uses: docker/setup-buildx-action@v3
@@ -93,7 +96,9 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/${{ github.repository }}
-          flavor: latest=true
+          flavor: |
+            latest=true
+            prefix=${{ matrix.variant }}-,onlatest=true
           tags: |
             type=raw,value=${{ needs.Get-Resonite-Versions.outputs.buildid }}
             type=raw,value=${{ needs.Get-Resonite-Versions.outputs.version }}
@@ -107,15 +112,14 @@ jobs:
             net.pluser.resonite-container.resonite-version=${{ needs.Get-Resonite-Versions.outputs.version }}
       - name: Cache Resonite binary
         id: cache-resonite
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ./steamdata
           key: ${{ needs.Get-Latest-Resonite-Package.outputs.cachekey }}
       - name: Build and push images
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: ./Dockerfile
+          context: ./${{ matrix.variant }}
           push: true
           tags: ${{ steps.extmeta.outputs.tags }}
           labels: ${{ steps.extmeta.outputs.labels }}
