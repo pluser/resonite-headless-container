@@ -45,7 +45,7 @@ jobs:
           yq -P -o shell '.data.2519830.depots.branches.headless' >>
           "${GITHUB_OUTPUT}"
 
-  Get-Resonite-Versions:
+  Get-Resonite-Version:
     needs:
       - Get-Latest-Resonite-Package
     runs-on: ubuntu-latest
@@ -69,10 +69,24 @@ jobs:
           perl -nlE 'if ($_ =~ /buildid/) { $_ =~ s/\s*"buildid"\s*\"(\d+)\"\s*/$1/; print $_; }')" >>
           "${GITHUB_OUTPUT}"
 
+  Get-Crystite-Version:
+    runs-on: ubuntu-latest
+    outputs:
+      commit-hash: ${{ steps.commit-hash.outputs.longhash }}
+    steps:
+      - name: Checkout Crystite Repository
+        uses: actions/checkout@v4
+      - name: Extract commit hash
+        id: commit-hash
+        run: |
+          echo "longhash=$(git show --format='%H' --no-patch)" >> "${GITHUB_OUTPUT}"
+          echo "shorthash=$(git show --format='%h' --no-patch)" >> "${GITHUB_OUTPUT}"
+
   Build-Resonite-Container:
     needs:
       - Get-Latest-Resonite-Package
-      - Get-Resonite-Versions
+      - Get-Resonite-Version
+      - Get-Crystite-Version
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -100,16 +114,18 @@ jobs:
             latest=true
             prefix=${{ matrix.variant }}-,onlatest=true
           tags: |
-            type=raw,value=${{ needs.Get-Resonite-Versions.outputs.buildid }}
-            type=raw,value=${{ needs.Get-Resonite-Versions.outputs.version }}
+            type=raw,value=${{ needs.Get-Resonite-Version.outputs.buildid }}
+            type=raw,value=${{ needs.Get-Resonite-Version.outputs.version }}
           labels: |
             org.opencontainers.image.title=Resonite Container
-            net.pluser.resonite-container.steam-buildid=${{ needs.Get-Resonite-Versions.outputs.buildid }}
-            net.pluser.resonite-container.resonite-version=${{ needs.Get-Resonite-Versions.outputs.version }}
+            net.nemnomi.resonite-container.steam-buildid=${{ needs.Get-Resonite-Version.outputs.buildid }}
+            net.nemnomi.resonite-container.resonite-version=${{ needs.Get-Resonite-Version.outputs.version }}
+            ${{ matrix.variant != 'vanilla' && format('net.nemnomi.resonite-container.crystite-commit={0}', needs.Get-Crystite-Version.outputs.commit-hash) }}
           annotations: |
             org.opencontainers.image.title=Resonite Container
-            net.pluser.resonite-container.steam-buildid=${{ needs.Get-Resonite-Versions.outputs.buildid }}
-            net.pluser.resonite-container.resonite-version=${{ needs.Get-Resonite-Versions.outputs.version }}
+            net.nemnomi.resonite-container.steam-buildid=${{ needs.Get-Resonite-Version.outputs.buildid }}
+            net.nemnomi.resonite-container.resonite-version=${{ needs.Get-Resonite-Version.outputs.version }}
+            ${{ matrix.variant != 'vanilla' && format('net.nemnomi.resonite-container.crystite-commit={0}', needs.Get-Crystite-Version.outputs.commit-hash) }}
       - name: Cache Resonite binary
         id: cache-resonite
         uses: actions/cache@v4

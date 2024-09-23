@@ -16,7 +16,7 @@ jobs:
         id: buildid_current
         uses: flownative/action-docker-get-label@v1
         with:
-          image: ghcr.io/${{ github.repository }}:latest
+          image: ghcr.io/${{ github.repository }}:vanilla-latest
           label: net.pluser.resonite-container.steam-buildid
           registry_username: ${{ github.actor }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
