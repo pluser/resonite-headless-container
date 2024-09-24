@@ -21,6 +21,14 @@ RUN dotnet publish -f net8.0 -c Release -r linux-x64 --self-contained false -o b
 
 
 
+
+FROM docker.io/alpine/curl:latest AS mod
+RUN mkdir -p /Resonite/Libraries /Resonite/rml_mods /Resonite/rml_libs /Resonite/rml_config && \
+curl -Lo /Resonite/Libraries/ResoniteModLoader.dll 'https://github.com/resonite-modding-group/ResoniteModLoader/releases/latest/download/ResoniteModLoader.dll' && \
+curl -Lo /Resonite/rml_libs/0Harmony.dll 'https://github.com/resonite-modding-group/ResoniteModLoader/releases/latest/download/0Harmony.dll'
+
+
+
 FROM mcr.microsoft.com/dotnet/aspnet:8.0-bookworm-slim AS runtime
 RUN apt-get update && apt-get install -y wget libassimp5 libfreeimage3 libfreetype6 libopus0 libbrotli1 zlib1g yt-dlp jq yq unzip && rm -rf /var/lib/{apt,cache,dpkg}
 
@@ -37,15 +45,7 @@ ln -s /usr/local/lib/crystite/crystite /usr/local/bin/crystite && \
 ln -s /usr/local/lib/crystitectl/crystitectl /usr/local/bin/crystitectl && \
 mkdir -p /etc/crystite/conf.d
 
-RUN \
-mkdir \
-/opt/Resonite/Libraries \
-/opt/Resonite/rml_mods \
-/opt/Resonite/rml_libs \
-/opt/Resonite/rml_config && \
-curl -Lo /opt/Resonite/Libraries/ResoniteModLoader.dll "https://github.com/resonite-modding-group/ResoniteModLoader/releases/latest/download/ResoniteModLoader.dll" && \
-curl -Lo /opt/Resonite/rml_libs/0Harmony.dll "https://github.com/resonite-modding-group/ResoniteModLoader/releases/latest/download/0Harmony.dll"
-
+COPY --from=mod /Resonite/* /opt/Resonite/
 
 
 VOLUME ["/var/lib/resonite/cache", "/var/lib/resonite/data", "/var/lib/resonite/logs", "/etc/crystite/conf.d"]
