@@ -76,8 +76,11 @@ jobs:
     steps:
       - name: Checkout Crystite Repository
         uses: actions/checkout@v4
+        with:
+          repository: Nihlus/Crystite
       - name: Extract commit hash
         id: commit-hash
+        working-directory: Crystite
         run: |
           echo "longhash=$(git show --format='%H' --no-patch)" >> "${GITHUB_OUTPUT}"
           echo "shorthash=$(git show --format='%h' --no-patch)" >> "${GITHUB_OUTPUT}"
