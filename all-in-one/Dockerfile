@@ -25,7 +25,12 @@ RUN dotnet publish -f net8.0 -c Release -r linux-x64 --self-contained false -o b
 FROM docker.io/alpine/curl:latest AS mod
 RUN mkdir -p /Resonite/Libraries /Resonite/rml_mods /Resonite/rml_libs /Resonite/rml_config && \
 curl -Lo /Resonite/Libraries/ResoniteModLoader.dll 'https://github.com/resonite-modding-group/ResoniteModLoader/releases/latest/download/ResoniteModLoader.dll' && \
-curl -Lo /Resonite/rml_libs/0Harmony.dll 'https://github.com/resonite-modding-group/ResoniteModLoader/releases/latest/download/0Harmony.dll'
+curl -Lo /Resonite/rml_libs/0Harmony.dll 'https://github.com/resonite-modding-group/ResoniteModLoader/releases/latest/download/0Harmony.dll' && \
+curl -Lo /Resonite/rml_libs/Outflow.dll 'https://github.com/BlueCyro/Outflow/releases/latest/download/Outflow.dll' && \
+curl -Lo /Resonite/rml_libs/HeadlessTweaks.dll 'https://github.com/New-Project-Final-Final-WIP/HeadlessTweaks/releases/latest/download/HeadlessTweaks.dll' && \
+curl -Lo /Resonite/rml_libs/StresslessHeadless.dll 'https://github.com/Raidriar796/StresslessHeadless/releases/latest/download/StresslessHeadless.dll'
+
+
 
 
 
@@ -48,6 +53,6 @@ mkdir -p /etc/crystite/conf.d
 COPY --from=mod /Resonite/* /opt/Resonite/
 
 
-VOLUME ["/var/lib/resonite/cache", "/var/lib/resonite/data", "/var/lib/resonite/logs", "/etc/crystite/conf.d"]
+VOLUME ["/var/lib/resonite/cache", "/var/lib/resonite/data", "/var/lib/resonite/logs", "/etc/crystite/conf.d", "/opt/Resonite/rml_config"]
 STOPSIGNAL SIGINT
 ENTRYPOINT [ "/usr/local/bin/resonite" ]
