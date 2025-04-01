@@ -66,7 +66,7 @@ jobs:
         id: buildid
         run: >
           echo "buildid=$(cat ./steamdata/steamapps/appmanifest_2519830.acf |
-          perl -nlE 'if ($_ =~ /buildid/) { $_ =~ s/\s*"buildid"\s*\"(\d+)\"\s*/$1/; print $_; }')" >>
+          perl -nlE 'if ($_ =~ /buildid/) { $_ =~ s/\s*"buildid"\s*\"(\d+)\"\s*/$1/; print $_; }' | head -n 1)" >>
           "${GITHUB_OUTPUT}"
 
   Get-Crystite-Version:
