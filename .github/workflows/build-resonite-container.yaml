@@ -135,6 +135,8 @@ jobs:
         with:
           path: ./steamdata
           key: ${{ needs.Get-Latest-Resonite-Package.outputs.cachekey }}
+      - name: Free disk space
+        run: curl -fsSL https://raw.githubusercontent.com/kou/arrow/e49d8ae15583ceff03237571569099a6ad62be32/ci/scripts/util_free_space.sh | bash
       - name: Build and push images
         uses: docker/build-push-action@v5
         with:
