@@ -42,7 +42,7 @@ jobs:
         id: buildid
         run: >
           curl -X GET 'https://api.steamcmd.net/v1/info/2519830' |
-          yq -P -o shell '.data.2519830.depots.branches.headless' >>
+          yq -P -o shell '.data.2519830.depots.branches.release' >>
           "${GITHUB_OUTPUT}"
 
   Get-Resonite-Version:
@@ -96,7 +96,7 @@ jobs:
       packages: write
     strategy:
       matrix:
-        variant: [vanilla, crystite, all-in-one]
+        variant: [vanilla, flavored]
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
@@ -123,12 +123,12 @@ jobs:
             org.opencontainers.image.title=Resonite Container
             net.nemnomi.resonite-container.steam-buildid=${{ needs.Get-Resonite-Version.outputs.buildid }}
             net.nemnomi.resonite-container.resonite-version=${{ needs.Get-Resonite-Version.outputs.version }}
-            ${{ matrix.variant != 'vanilla' && format('net.nemnomi.resonite-container.crystite-commit={0}', needs.Get-Crystite-Version.outputs.commit-hash) }}
+            ${{ matrix.variant == 'crystite' && format('net.nemnomi.resonite-container.crystite-commit={0}', needs.Get-Crystite-Version.outputs.commit-hash) }}
           annotations: |
             org.opencontainers.image.title=Resonite Container
             net.nemnomi.resonite-container.steam-buildid=${{ needs.Get-Resonite-Version.outputs.buildid }}
             net.nemnomi.resonite-container.resonite-version=${{ needs.Get-Resonite-Version.outputs.version }}
-            ${{ matrix.variant != 'vanilla' && format('net.nemnomi.resonite-container.crystite-commit={0}', needs.Get-Crystite-Version.outputs.commit-hash) }}
+            ${{ matrix.variant == 'crystite' && format('net.nemnomi.resonite-container.crystite-commit={0}', needs.Get-Crystite-Version.outputs.commit-hash) }}
       - name: Cache Resonite binary
         id: cache-resonite
         uses: actions/cache@v4
