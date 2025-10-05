@@ -137,8 +137,25 @@ jobs:
           key: ${{ needs.Get-Latest-Resonite-Package.outputs.cachekey }}
       - name: Free disk space
         run: curl -fsSL https://raw.githubusercontent.com/kou/arrow/e49d8ae15583ceff03237571569099a6ad62be32/ci/scripts/util_free_space.sh | bash
+      - name: Build images for testing
+        uses: docker/build-push-action@v6
+        with:
+          context: ./${{ matrix.variant }}
+          load: true
+          tags: test-${{ matrix.variant }}
+          labels: ${{ steps.extmeta.outputs.labels }}
+          annotations: ${{ steps.extmeta.outputs.annotations }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          secrets: |
+            STEAM_USERNAME=${{ secrets.STEAM_USERNAME }}
+            STEAM_PASSWORD=${{ secrets.STEAM_PASSWORD }}
+            HEADLESS_CODE=${{ secrets.HEADLESS_CODE }}
+      - name: Basic test
+        run: |
+          docker run --rm --env RESONITE_HEADLESS_CODE=${{ secrets.HEADLESS_CODE }} test-${{ matrix.variant }}
       - name: Build and push images
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: ./${{ matrix.variant }}
           push: true
@@ -146,6 +163,8 @@ jobs:
           labels: ${{ steps.extmeta.outputs.labels }}
           annotations: ${{ steps.extmeta.outputs.annotations }}
           provenance: false # avoid bug of github https://github.com/orgs/community/discussions/45969
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           secrets: |
             STEAM_USERNAME=${{ secrets.STEAM_USERNAME }}
             STEAM_PASSWORD=${{ secrets.STEAM_PASSWORD }}
