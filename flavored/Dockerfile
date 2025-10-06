@@ -34,4 +34,5 @@ VOLUME ["/var/lib/resonite/cache", "/var/lib/resonite/config", "/var/lib/resonit
 # HEALTHCHECK --interval=5s --timeout=10s --start-period=60s --retries=4 CMD test "$(cat /va/lib/resonite/watchdog)" != "$(cat /var/lib/resonite/_watchdog)" || exit 1; cat /var/lib/resonite/watchdog > /var/lib/resonite/_watchdog
 STOPSIGNAL SIGINT
 WORKDIR "/opt/Resonite/Headless"
+EXPOSE 9000
 ENTRYPOINT [ "/usr/local/bin/resonite" ]
