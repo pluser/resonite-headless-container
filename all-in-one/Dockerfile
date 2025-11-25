@@ -13,7 +13,7 @@ RUN \
 
 
 
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS crystite
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS crystite
 RUN git clone --depth 1 https://github.com/Nihlus/Crystite.git
 WORKDIR /Crystite
 RUN dotnet publish -f net8.0 -c Release -r linux-x64 --self-contained false -o bin/crystite Crystite/Crystite.csproj
@@ -34,7 +34,7 @@ curl -Lo /Resonite/rml_libs/StresslessHeadless.dll 'https://github.com/Raidriar7
 
 
 
-FROM mcr.microsoft.com/dotnet/aspnet:9.0-bookworm-slim AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-noble AS runtime
 RUN apt-get update && apt-get install -y wget libassimp5 libfreeimage3 libfreetype6 libopus0 libbrotli1 zlib1g yt-dlp jq yq unzip && rm -rf /var/lib/{apt,cache,dpkg}
 
 COPY --from=steam /steamdata /opt/Resonite

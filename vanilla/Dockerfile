@@ -15,7 +15,7 @@ RUN \
 
 
 
-FROM mcr.microsoft.com/dotnet/runtime:9.0 AS runtime
+FROM mcr.microsoft.com/dotnet/runtime:10.0 AS runtime
 
 RUN apt-get update && apt-get install -y libopus-dev libopus0 opus-tools libc-dev && rm -rf /var/lib/{apt,cache,dpkg}
 
