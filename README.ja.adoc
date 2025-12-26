@@ -1,0 +1,92 @@
+﻿= resonite-headless-container
+
+このリポジトリは、VR SNS である link:https://resonite.com/[Resonite] の Headless サーバー用コンテナイメージを作成するためのものです。
+
+== 特徴
+
+* **イミュータブル**: Resonite のバイナリはコンテナイメージに直接埋め込まれています。これにより、外部要因によって内容が変化せず、再現性の高い運用が可能です。
+* **2種類のイメージ**:
+** **vanilla**: 何も手を加えていない標準的な Resonite Headless サーバーです。
+** **flavored**: Headless サーバーの運用に便利な機能を追加するため、いくつかの Mod（ResoniteModLoader、Headless Prometheus Exporter など）を含んでいます。
+
+== 注意事項
+
+Resonite の Headless バイナリは非公開であるため、ビルド済みのコンテナイメージを直接配布することはできません。
+利用者はこのリポジトリをクローンまたはフォークし、**各自でコンテナイメージをビルドする必要があります。**
+
+== ビルド方法
+
+コンテナイメージのビルドには、Resonite への一定額以上の寄付で受け取れる特定のキーが必要です。
+また、Steam CMD を使用してバイナリをダウンロードするため、Steam アカウントの情報も必要です。
+
+=== 必要な環境変数
+
+ビルド時に以下の環境変数を指定してください。
+
+[cols="1,2"]
+|===
+| 変数名 | 説明
+
+| `HEADLESS_CODE`
+| Resonite への寄付で受け取れる Headless 用のベータキー。
+
+| `STEAM_USERNAME`
+| Steam のユーザー名。
+
+| `STEAM_PASSWORD`
+| Steam のパスワード。
+|===
+
+[IMPORTANT]
+====
+Steam へのログインを自動化するため、**Steam Guard をオフにする必要があります。**
+====
+
+=== ビルドコマンド例
+
+[source,bash]
+----
+# vanilla イメージのビルド
+docker build --secret id=HEADLESS_CODE,env=HEADLESS_CODE \
+             --secret id=STEAM_USERNAME,env=STEAM_USERNAME \
+             --secret id=STEAM_PASSWORD,env=STEAM_PASSWORD \
+             -t resonite-vanilla ./vanilla
+
+# flavored イメージのビルド
+docker build --secret id=HEADLESS_CODE,env=HEADLESS_CODE \
+             --secret id=STEAM_USERNAME,env=STEAM_USERNAME \
+             --secret id=STEAM_PASSWORD,env=STEAM_PASSWORD \
+             -t resonite-flavored ./flavored
+----
+
+== 実行方法
+
+コンテナを起動する際にも、改めて Headless キーを指定する必要があります。
+また、サーバーの設定ファイル（`Config.json`）をコンテナに渡す必要があります。
+
+=== 実行時の環境変数
+
+[cols="1,2"]
+|===
+| 変数名 | 説明
+
+| `RESONITE_HEADLESS_CODE`
+| 寄付によって配布された Headless 用のキー。
+|===
+
+=== 設定ファイルの配置
+
+Resonite の設定ファイル（`Config.json`）をホスト上のディレクトリに作成し、それをコンテナの `/var/lib/resonite/config` にマウントしてください。
+コンテナ内では `/var/lib/resonite/config/Config.json` が設定ファイルとして読み込まれます。
+
+=== 実行コマンド例
+
+[source,bash]
+----
+docker run -d \
+  -e RESONITE_HEADLESS_CODE=あなたのキー \
+  -v /path/to/config_dir:/var/lib/resonite/config \
+  resonite-flavored
+----
+
+`flavored` イメージを使用しており、Mod の設定（ResoniteModLoader）を行いたい場合は、`/opt/Resonite/Headless/rml_config` もマウントすることで設定ファイルを永続化・変更できます。

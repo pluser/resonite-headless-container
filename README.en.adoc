@@ -1,0 +1,92 @@
+﻿= resonite-headless-container
+
+This repository is for creating container images for the Headless server of link:https://resonite.com/[Resonite], a VR SNS.
+
+== Features
+
+* **Immutable**: Resonite binaries are directly embedded in the container image. This ensures that the content does not change due to external factors, allowing for highly reproducible operations.
+* **Two types of images**:
+** **vanilla**: A standard Resonite Headless server with no modifications.
+** **flavored**: Includes several mods (ResoniteModLoader, Headless Prometheus Exporter, etc.) to add convenient features for Headless server operation.
+
+== Precautions
+
+Since Resonite's Headless binaries are private, pre-built container images cannot be distributed directly.
+Users must clone or fork this repository and **build the container images themselves.**
+
+== How to Build
+
+Building the container image requires a specific key that can be obtained by donating a certain amount to Resonite.
+Also, since SteamCMD is used to download the binaries, Steam account information is required.
+
+=== Required Environment Variables
+
+Please specify the following environment variables during the build.
+
+[cols="1,2"]
+|===
+| Variable Name | Description
+
+| `HEADLESS_CODE`
+| The beta key for Headless obtained by donating to Resonite.
+
+| `STEAM_USERNAME`
+| Your Steam username.
+
+| `STEAM_PASSWORD`
+| Your Steam password.
+|===
+
+[IMPORTANT]
+====
+To automate the Steam login, **you must turn off Steam Guard.**
+====
+
+=== Build Command Examples
+
+[source,bash]
+----
+# Build vanilla image
+docker build --secret id=HEADLESS_CODE,env=HEADLESS_CODE \
+             --secret id=STEAM_USERNAME,env=STEAM_USERNAME \
+             --secret id=STEAM_PASSWORD,env=STEAM_PASSWORD \
+             -t resonite-vanilla ./vanilla
+
+# Build flavored image
+docker build --secret id=HEADLESS_CODE,env=HEADLESS_CODE \
+             --secret id=STEAM_USERNAME,env=STEAM_USERNAME \
+             --secret id=STEAM_PASSWORD,env=STEAM_PASSWORD \
+             -t resonite-flavored ./flavored
+----
+
+== How to Run
+
+When starting the container, you need to specify the Headless key again.
+In addition, you need to pass the server configuration file (`Config.json`) to the container.
+
+=== Runtime Environment Variables
+
+[cols="1,2"]
+|===
+| Variable Name | Description
+
+| `RESONITE_HEADLESS_CODE`
+| The Headless key distributed via donation.
+|===
+
+=== Configuration File Placement
+
+Create the Resonite configuration file (`Config.json`) in a directory on the host and mount it to `/var/lib/resonite/config` in the container.
+Inside the container, `/var/lib/resonite/config/Config.json` will be read as the configuration file.
+
+=== Execution Command Example
+
+[source,bash]
+----
+docker run -d \
+  -e RESONITE_HEADLESS_CODE=your_key_here \
+  -v /path/to/config_dir:/var/lib/resonite/config \
+  resonite-flavored
+----
+
+If you are using the `flavored` image and want to configure Mod settings (ResoniteModLoader), you can persist and change the configuration files by also mounting `/opt/Resonite/Headless/rml_config`.

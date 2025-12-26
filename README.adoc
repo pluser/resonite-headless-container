@@ -1,0 +1,4 @@
+﻿link:README.en.adoc[English]
+link:README.ja.adoc[日本語]
+
+include::README.en.adoc[]
