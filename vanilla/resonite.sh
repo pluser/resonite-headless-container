@@ -5,4 +5,9 @@ if [[ $(echo "${RESONITE_HEADLESS_CODE}" | sha1sum - | head -c 40) != 'd1f3ba9ef
   exit 1
 fi
 
-exec dotnet /opt/Resonite/Headless/Resonite.dll -Invisible -HeadlessConfig /var/lib/resonite/config/Config.json -Watchdog /var/lib/resonite/watchdog -Data /var/lib/resonite/data -Cache /var/lib/resonite/cache -Logs /var/lib/resonite/logs "$@"
+ARGS=()
+if [[ -n "${RESONITE_INVISIBLE}" && "${RESONITE_INVISIBLE}" != "false" ]]; then
+  ARGS+=("-Invisible")
+fi
+
+exec dotnet /opt/Resonite/Headless/Resonite.dll "${ARGS[@]}" -HeadlessConfig /var/lib/resonite/config/Config.json -Watchdog /var/lib/resonite/watchdog -Data /var/lib/resonite/data -Cache /var/lib/resonite/cache -Logs /var/lib/resonite/logs "$@"
