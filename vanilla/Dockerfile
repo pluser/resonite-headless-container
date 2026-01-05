@@ -26,7 +26,7 @@ RUN mkdir -p /var/lib/resonite/cache /var/lib/resonite/config /var/lib/resonite/
 COPY ./resonite.sh /usr/local/bin/resonite
 
 VOLUME ["/var/lib/resonite/cache", "/var/lib/resonite/config", "/var/lib/resonite/data", "/var/lib/resonite/logs"]
-HEALTHCHECK --interval=5s --timeout=10s --start-period=60s --retries=4 CMD test "$(cat /va/lib/resonite/watchdog)" != "$(cat /var/lib/resonite/_watchdog)" || exit 1; cat /var/lib/resonite/watchdog > /var/lib/resonite/_watchdog
+HEALTHCHECK --interval=5s --timeout=10s --start-period=60s --retries=4 CMD test "$(cat /var/lib/resonite/watchdog)" != "$(cat /var/lib/resonite/_watchdog)" || exit 1; cat /var/lib/resonite/watchdog > /var/lib/resonite/_watchdog
 STOPSIGNAL SIGINT
 WORKDIR "/opt/Resonite/Headless"
 ENTRYPOINT [ "/usr/local/bin/resonite" ]
