@@ -13,6 +13,12 @@ jobs:
     outputs:
       cachekey: ${{ runner.os }}-resonite-genuine-${{ github.run_id }}-${{ github.run_attempt }}
     steps:
+      - name: Maximize build disk space
+        uses: easimon/maximize-build-space@v10
+        with:
+          remove-android: 'true'
+          remove-haskell: 'true'
+          remove-codeql: 'true'
       - name: Setup steamcmd
         uses: CyberAndrii/setup-steamcmd@v1
       - name: Download and install Resonite
