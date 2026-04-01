@@ -19,11 +19,10 @@ jobs:
           docker-images: false
           dotnet: false
           large-packages: false
-      - name: Setup steamcmd
-        uses: CyberAndrii/setup-steamcmd@v1
       - name: Download and install Resonite
         run: >
           mkdir -p steamdata &&
+          docker run --mount type=bind,source="$(pwd)/steamdata",target="$(pwd)/steamdata" docker.io/steamcmd/steamcmd:ubuntu-24 --
           steamcmd
           +force_install_dir "$(pwd)/steamdata/"
           +login ${{ secrets.STEAM_USERNAME }} ${{ secrets.STEAM_PASSWORD }}
