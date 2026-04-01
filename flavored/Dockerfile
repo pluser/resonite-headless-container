@@ -11,7 +11,8 @@ RUN \
 +force_install_dir /steamdata \
 +login $(cat /run/secrets/STEAM_USERNAME) $(cat /run/secrets/STEAM_PASSWORD) \
 +app_update 2519830 -beta headless -betapassword $(cat /run/secrets/HEADLESS_CODE) \
-+quit
++quit \
+|| true
 
 # install Resonite Mod Loader
 ADD https://github.com/resonite-modding-group/ResoniteModLoader/releases/latest/download/ResoniteModLoader.dll /steamdata/Headless/Libraries/
