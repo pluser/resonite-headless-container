@@ -28,6 +28,7 @@ jobs:
           +login ${{ secrets.STEAM_USERNAME }} ${{ secrets.STEAM_PASSWORD }}
           +app_update 2519830 -beta headless -betapassword ${{ secrets.HEADLESS_CODE }} validate
           +quit
+          || true
       - name: Cache Resonite binary
         id: cache-resonite
         uses: actions/cache/save@v4
