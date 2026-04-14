@@ -175,3 +175,73 @@ jobs:
             STEAM_USERNAME=${{ secrets.STEAM_USERNAME }}
             STEAM_PASSWORD=${{ secrets.STEAM_PASSWORD }}
             HEADLESS_CODE=${{ secrets.HEADLESS_CODE }}
+
+  Notify-Discord:
+    needs:
+      - Get-Resonite-Version
+      - Build-Resonite-Container
+    if: always()
+    runs-on: ubuntu-latest
+    env:
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+    steps:
+      - name: Notify Discord on success
+        if: needs.Build-Resonite-Container.result == 'success' && env.DISCORD_WEBHOOK_URL != ''
+        run: |
+          curl -fsSL -X POST "${DISCORD_WEBHOOK_URL}" \
+            -H 'Content-Type: application/json' \
+            -d @- <<'PAYLOAD'
+          {
+            "embeds": [{
+              "title": "Container Build Succeeded",
+              "description": "All container image variants have been built and pushed successfully.",
+              "color": 3066993,
+              "fields": [
+                {
+                  "name": "Resonite Version",
+                  "value": "`${{ needs.Get-Resonite-Version.outputs.version }}`",
+                  "inline": true
+                },
+                {
+                  "name": "Steam Build ID",
+                  "value": "`${{ needs.Get-Resonite-Version.outputs.buildid }}`",
+                  "inline": true
+                },
+                {
+                  "name": "Workflow Run",
+                  "value": "[View Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+                }
+              ]
+            }]
+          }
+          PAYLOAD
+      - name: Notify Discord on failure
+        if: needs.Build-Resonite-Container.result == 'failure' && env.DISCORD_WEBHOOK_URL != ''
+        run: |
+          curl -fsSL -X POST "${DISCORD_WEBHOOK_URL}" \
+            -H 'Content-Type: application/json' \
+            -d @- <<'PAYLOAD'
+          {
+            "embeds": [{
+              "title": "Container Build Failed",
+              "description": "One or more container image variants failed to build.",
+              "color": 15158332,
+              "fields": [
+                {
+                  "name": "Resonite Version",
+                  "value": "`${{ needs.Get-Resonite-Version.outputs.version }}`",
+                  "inline": true
+                },
+                {
+                  "name": "Steam Build ID",
+                  "value": "`${{ needs.Get-Resonite-Version.outputs.buildid }}`",
+                  "inline": true
+                },
+                {
+                  "name": "Workflow Run",
+                  "value": "[View Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+                }
+              ]
+            }]
+          }
+          PAYLOAD
