@@ -39,7 +39,7 @@ jobs:
             ${{ runner.os }}-resonite-genuine
 
   Check-Latest-BuildID:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     outputs:
       build-id: ${{ steps.buildid.outputs.buildid }}
       timeupdated: ${{ steps.buildid.outputs.timeupdated }}
@@ -54,7 +54,7 @@ jobs:
   Get-Resonite-Version:
     needs:
       - Get-Latest-Resonite-Package
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     outputs:
       version: ${{ steps.cver.outputs.version }}
       buildid: ${{ steps.buildid.outputs.buildid }}
@@ -76,7 +76,7 @@ jobs:
           "${GITHUB_OUTPUT}"
 
   Get-Crystite-Version:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     outputs:
       commit-hash: ${{ steps.commit-hash.outputs.longhash }}
     steps:
@@ -179,7 +179,7 @@ jobs:
       - Get-Resonite-Version
       - Build-Resonite-Container
     if: always()
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     env:
       DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
     steps:
