@@ -35,8 +35,6 @@ jobs:
         with:
           path: ./steamdata
           key: ${{ runner.os }}-resonite-genuine-${{ github.run_id }}-${{ github.run_attempt }}
-          restore-keys: |
-            ${{ runner.os }}-resonite-genuine
 
   Check-Latest-BuildID:
     runs-on: ubuntu-slim
@@ -81,7 +79,7 @@ jobs:
       commit-hash: ${{ steps.commit-hash.outputs.longhash }}
     steps:
       - name: Checkout Crystite Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: Nihlus/Crystite
       - name: Extract commit hash
@@ -105,7 +103,7 @@ jobs:
         variant: [vanilla, flavored]
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup buildx
         uses: docker/setup-buildx-action@v3
       - name: Login to the container registry
