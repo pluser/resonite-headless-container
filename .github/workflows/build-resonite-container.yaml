@@ -35,8 +35,6 @@ jobs:
         with:
           path: ./steamdata
           key: ${{ runner.os }}-resonite-genuine-${{ github.run_id }}-${{ github.run_attempt }}
-          restore-keys: |
-            ${{ runner.os }}-resonite-genuine
 
   Check-Latest-BuildID:
     runs-on: ubuntu-latest
