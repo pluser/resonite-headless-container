@@ -31,7 +31,7 @@ jobs:
           || true
       - name: Cache Resonite binary
         id: cache-resonite
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: ./steamdata
           key: ${{ runner.os }}-resonite-genuine-${{ github.run_id }}-${{ github.run_attempt }}
@@ -59,7 +59,7 @@ jobs:
     steps:
       - name: Cache Resonite binary
         id: cache-resonite
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: ./steamdata
           key: ${{ needs.Get-Latest-Resonite-Package.outputs.cachekey }}
@@ -135,7 +135,7 @@ jobs:
             ${{ matrix.variant == 'crystite' && format('net.nemnomi.resonite-container.crystite-commit={0}', needs.Get-Crystite-Version.outputs.commit-hash) }}
       - name: Cache Resonite binary
         id: cache-resonite
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: ./steamdata
           key: ${{ needs.Get-Latest-Resonite-Package.outputs.cachekey }}
