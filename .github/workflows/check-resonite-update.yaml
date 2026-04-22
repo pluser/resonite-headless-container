@@ -14,7 +14,7 @@ jobs:
     steps:
       - name: Get the last built version
         id: buildid_current
-        uses: flownative/action-docker-get-label@v1
+        uses: flownative/action-docker-get-label@v1.0.1
         with:
           image: ghcr.io/${{ github.repository }}:vanilla-latest
           label: net.nemnomi.resonite-container.steam-buildid
