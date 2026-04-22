@@ -23,7 +23,7 @@ jobs:
           registry_endpoint: https://ghcr.io/v2/
 
   Get-Latest-BuildID:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     outputs:
       build-id: ${{ steps.buildid.outputs.buildid }}
       timeupdated: ${{ steps.buildid.outputs.timeupdated }}
