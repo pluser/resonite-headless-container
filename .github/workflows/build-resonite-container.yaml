@@ -151,8 +151,7 @@ jobs:
           tags: test-${{ matrix.variant }}
           labels: ${{ steps.extmeta.outputs.labels }}
           annotations: ${{ steps.extmeta.outputs.annotations }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          no-cache: true
           secrets: |
             STEAM_USERNAME=${{ secrets.STEAM_USERNAME }}
             STEAM_PASSWORD=${{ secrets.STEAM_PASSWORD }}
@@ -169,8 +168,7 @@ jobs:
           labels: ${{ steps.extmeta.outputs.labels }}
           annotations: ${{ steps.extmeta.outputs.annotations }}
           provenance: false # avoid bug of github https://github.com/orgs/community/discussions/45969
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          no-cache: true
           secrets: |
             STEAM_USERNAME=${{ secrets.STEAM_USERNAME }}
             STEAM_PASSWORD=${{ secrets.STEAM_PASSWORD }}
