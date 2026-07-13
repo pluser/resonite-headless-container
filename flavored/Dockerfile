@@ -20,6 +20,7 @@ ADD https://github.com/resonite-modding-group/ResoniteModLoader/releases/latest/
 
 # install Headless Prometheus Exporter
 ADD https://github.com/pluser/resonite-mod-headless-prometheus-exporter/releases/latest/download/HeadlessPrometheusExporter.dll /steamdata/Headless/rml_mods/
+ADD https://github.com/rabbuttz/SyncUnclogDiagnostics/releases/latest/download/SyncUnclogDiagnostics.dll /steamdata/Headless/rml_mods/
 
 FROM mcr.microsoft.com/dotnet/runtime:10.0 AS runtime
 
