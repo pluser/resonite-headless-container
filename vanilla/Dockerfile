@@ -9,6 +9,7 @@ RUN \
 --mount=type=secret,id=HEADLESS_CODE \
 /usr/games/steamcmd \
 +force_install_dir /steamdata \
++@sSteamCmdForcePlatformType windows \
 +login $(cat /run/secrets/STEAM_USERNAME) $(cat /run/secrets/STEAM_PASSWORD) \
 +app_update 2519830 -beta headless -betapassword $(cat /run/secrets/HEADLESS_CODE) \
 +quit \
