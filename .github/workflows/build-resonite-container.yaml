@@ -9,7 +9,8 @@ on:
 
 jobs:
   Get-Latest-Resonite-Package:
-    runs-on: ubuntu-latest
+    # Work around https://github.com/actions/runner-images/issues/14790
+    runs-on: ubuntu-24.04
     outputs:
       cachekey: ${{ runner.os }}-resonite-genuine-${{ github.run_id }}-${{ github.run_attempt }}
     steps:
@@ -30,6 +31,11 @@ jobs:
           +app_update 2519830 -beta headless -betapassword ${{ secrets.HEADLESS_CODE }} validate
           +quit
           || true
+      - name: Verify Resonite download
+        run: |
+          test -s ./steamdata/Build.version
+          test -s ./steamdata/steamapps/appmanifest_2519830.acf
+          test -s ./steamdata/Headless/Resonite.dll
       - name: Cache Resonite binary
         id: cache-resonite
         uses: actions/cache/save@v5

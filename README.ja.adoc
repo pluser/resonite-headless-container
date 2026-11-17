@@ -59,6 +59,15 @@ docker build --secret id=HEADLESS_CODE,env=HEADLESS_CODE \
              -t resonite-flavored ./flavored
 ----
 
+=== GitHub Actions のランナー固定
+
+`Build Container` ワークフローの `Get-Latest-Resonite-Package` ジョブは、障害を回避するため `ubuntu-24.04` ランナーに固定しています。
+Ubuntu 26.04 ランナーの Docker 29.4.2 では、既定の seccomp 設定が 32 ビットの `socketcall` を制限し、SteamCMD が接続できなくなる link:https://github.com/actions/runner-images/issues/14790[既知の問題]があります。
+固定対象はランナー OS であり、Docker Engine や SteamCMD イメージのバージョンを厳密に固定するものではありません。
+
+`ubuntu-latest` のランナーが Docker 29.7.2 以降、または同等のセキュリティ修正を含むバージョンを提供するようになり、既定の seccomp 設定のままで SteamCMD の接続、バイナリの取得、バージョンと Build ID を含むタグの生成が成功することを確認できたら、固定を解除できます。
+これは暫定措置です。2026 年 11 月時点で Ubuntu 24.04 ランナーに含まれる Docker 28.0.4 は link:https://nvd.nist.gov/vuln/detail/CVE-2026-17106[CVE-2026-17106] の影響を受けるため、信頼できるイメージのみを使用してください。
+
 == 実行方法
 
 コンテナを起動する際にも、改めて Headless キーを指定する必要があります。

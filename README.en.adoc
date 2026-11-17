@@ -59,6 +59,15 @@ docker build --secret id=HEADLESS_CODE,env=HEADLESS_CODE \
              -t resonite-flavored ./flavored
 ----
 
+=== GitHub Actions Runner Pin
+
+The `Get-Latest-Resonite-Package` job in the `Build Container` workflow is pinned to the `ubuntu-24.04` runner as a temporary workaround.
+Docker 29.4.2 on the Ubuntu 26.04 runner restricts 32-bit `socketcall` operations in its default seccomp profile, causing a link:https://github.com/actions/runner-images/issues/14790[known issue] that prevents SteamCMD from connecting.
+This pins the runner OS, not an exact version of Docker Engine or the SteamCMD image.
+
+The pin can be removed once the `ubuntu-latest` runner provides Docker 29.7.2 or later, or a version with equivalent security fixes, and SteamCMD connectivity, binary download, and generation of tags containing the version and Build ID have been verified with the default seccomp profile.
+This is a temporary workaround. As of November 2026, Docker 28.0.4 on the Ubuntu 24.04 runner is affected by link:https://nvd.nist.gov/vuln/detail/CVE-2026-17106[CVE-2026-17106], so use only trusted images.
+
 == How to Run
 
 When starting the container, you need to specify the Headless key again.
