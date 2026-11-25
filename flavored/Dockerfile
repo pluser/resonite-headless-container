@@ -25,7 +25,7 @@ ADD https://github.com/rabbuttz/SyncUnclogDiagnostics/releases/latest/download/S
 
 FROM mcr.microsoft.com/dotnet/runtime:11.0 AS runtime
 
-RUN apt-get update && apt-get install -y libopus-dev libopus0 opus-tools libc-dev && rm -rf /var/lib/{apt,cache,dpkg}
+RUN apt-get update && apt-get install -y libopus-dev libopus0 opus-tools libc-dev libpng16-16t64 && rm -rf /var/lib/{apt,cache,dpkg}
 
 COPY --from=steam /steamdata /opt/Resonite
 # Steam Networking Socket does not support multiple instance.
